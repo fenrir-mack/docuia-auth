@@ -50,12 +50,13 @@ def login(dados: LoginInput, db: Session = Depends(get_db)):
 @router.post("/cadastro", status_code=201)
 def cadastro(dados: CadastroInput, db: Session = Depends(get_db)):
     """Registra um novo usuário."""
-    repo = UsuarioRepositoryImpl(db)
-    use_case = CadastroUseCase(repo)
     try:
+        repo = UsuarioRepositoryImpl(db)
+        use_case = CadastroUseCase(repo)
         usuario = use_case.executar(dados.nome, dados.email, dados.senha)
         return {"mensagem": "Conta criada com sucesso", "id": usuario.id}
-    except ValueError as e:
+    except Exception as e:
+        # Captura QUALQUER erro (banco, código, etc) e retorna como 400 para vermos no frontend
         raise HTTPException(status_code=400, detail=str(e))
 
 
