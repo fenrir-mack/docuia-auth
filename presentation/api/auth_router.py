@@ -17,16 +17,16 @@ router = APIRouter(prefix="/auth", tags=["Autenticação"])
 # --- Schemas de entrada (o que o frontend envia) ---
 
 class LoginInput(BaseModel):
-    email: EmailStr
+    email: str
     senha: str
 
 class CadastroInput(BaseModel):
     nome: str
-    email: EmailStr
+    email: str
     senha: str
 
 class RecuperarSenhaInput(BaseModel):
-    email: EmailStr
+    email: str
 
 class RedefinirSenhaInput(BaseModel):
     token: str
