@@ -5,7 +5,8 @@ from jose import jwt
 from datetime import datetime, timedelta
 import os
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Trocado de bcrypt para pbkdf2_sha256 para evitar o erro de limite de 72 bytes no Azure
+pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 
 JWT_SECRET = os.getenv("JWT_SECRET", "docuia-secret-dev")
 JWT_EXPIRY_HOURS = int(os.getenv("JWT_EXPIRY", "24"))
@@ -26,7 +27,7 @@ class LoginUseCase:
         if not usuario:
             raise ValueError("Email ou senha inválidos")
 
-        if not pwd_context.verify(senha[:72], usuario.senha_hash):
+        if not pwd_context.verify(senha, usuario.senha_hash):
             raise ValueError("Email ou senha inválidos")
 
         payload = {
@@ -55,7 +56,7 @@ class CadastroUseCase:
             raise ValueError("Já existe uma conta com este e-mail")
 
         print(f"DEBUG - Tamanho real da senha recebida: {len(senha)} caracteres")
-        senha_hash = pwd_context.hash(senha[:72])
+        senha_hash = pwd_context.hash(senha)
 
         novo_usuario = Usuario(
             id=None,
@@ -115,7 +116,7 @@ class RedefinirSenhaUseCase:
         if not usuario:
             raise ValueError("Usuário não encontrado")
 
-        usuario.senha_hash = pwd_context.hash(nova_senha[:72])
+        usuario.senha_hash = pwd_context.hash(nova_senha)
         self.repository.atualizar(usuario)
 
 
@@ -154,8 +155,8 @@ class AlterarSenhaUseCase:
         if not usuario:
             raise ValueError("Usuário não encontrado")
 
-        if not pwd_context.verify(senha_atual[:72], usuario.senha_hash):
+        if not pwd_context.verify(senha_atual, usuario.senha_hash):
             raise ValueError("Senha atual incorreta")
 
-        usuario.senha_hash = pwd_context.hash(nova_senha[:72])
+        usuario.senha_hash = pwd_context.hash(nova_senha)
         self.repository.atualizar(usuario)
