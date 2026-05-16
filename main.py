@@ -31,6 +31,8 @@ app.add_middleware(
 )
 
 # Registra os routers
+from sqlalchemy import text
+
 app.include_router(auth_router)
 app.include_router(perfil_router)
 
@@ -38,3 +40,18 @@ app.include_router(perfil_router)
 @app.get("/")
 def health_check():
     return {"status": "ok", "servico": "ms1_auth"}
+
+@app.get("/health")
+def database_health():
+    """Verifica se o banco de dados está acessível."""
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+        return {"status": "ok", "database": "connected", "servico": "ms1_auth"}
+    except Exception as e:
+        return {
+            "status": "error", 
+            "database": "disconnected", 
+            "details": str(e),
+            "servico": "ms1_auth"
+        }
