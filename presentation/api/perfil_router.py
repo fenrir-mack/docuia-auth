@@ -29,7 +29,6 @@ def get_usuario_id(credentials: HTTPAuthorizationCredentials = Depends(security)
 class EditarPerfilInput(BaseModel):
     nome: str
     cargo: str
-    bio: str
 
 class AlterarSenhaInput(BaseModel):
     senha_atual: str
@@ -52,8 +51,7 @@ def meu_perfil(
         "id": usuario.id,
         "nome": usuario.nome,
         "email": usuario.email,
-        "cargo": usuario.cargo,
-        "bio": usuario.bio
+        "cargo": usuario.cargo
     }
 
 
@@ -84,11 +82,11 @@ def editar_perfil(
     usuario_id: int = Depends(get_usuario_id),
     db: Session = Depends(get_db)
 ):
-    """Atualiza nome, cargo e bio do usuário autenticado."""
+    """Atualiza nome e cargo do usuário autenticado."""
     repo = UsuarioRepositoryImpl(db)
     use_case = EditarPerfilUseCase(repo)
     try:
-        usuario = use_case.executar(usuario_id, dados.nome, dados.cargo, dados.bio)
+        usuario = use_case.executar(usuario_id, dados.nome, dados.cargo)
         return {"mensagem": "Perfil atualizado", "nome": usuario.nome}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

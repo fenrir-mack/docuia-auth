@@ -1,4 +1,4 @@
-from domain.entities.usuario import Usuario
+﻿from domain.entities.usuario import Usuario
 from domain.ports.usuario_repository import IUsuarioRepository
 from passlib.context import CryptContext
 from jose import jwt
@@ -14,7 +14,7 @@ JWT_EXPIRY_HOURS = int(os.getenv("JWT_EXPIRY", "24"))
 
 class LoginUseCase:
     """
-    Caso de uso: Autenticar um usuário com email e senha.
+    Caso de uso: Autenticar um usuﾃ｡rio com email e senha.
     Retorna um JWT token em caso de sucesso.
     """
 
@@ -25,10 +25,10 @@ class LoginUseCase:
         usuario = self.repository.buscar_por_email(email)
 
         if not usuario:
-            raise ValueError("Email ou senha inválidos")
+            raise ValueError("Email ou senha invﾃ｡lidos")
 
         if not pwd_context.verify(senha, usuario.senha_hash):
-            raise ValueError("Email ou senha inválidos")
+            raise ValueError("Email ou senha invﾃ｡lidos")
 
         payload = {
             "sub": str(usuario.id),
@@ -43,17 +43,17 @@ class LoginUseCase:
 
 class CadastroUseCase:
     """
-    Caso de uso: Registrar um novo usuário no sistema.
-    Retorna o usuário criado.
+    Caso de uso: Registrar um novo usuﾃ｡rio no sistema.
+    Retorna o usuﾃ｡rio criado.
     """
 
     def __init__(self, repository: IUsuarioRepository):
         self.repository = repository
 
-    def executar(self, nome: str, email: str, senha: str) -> Usuario:
+    def executar(self, nome: str, cargo: str, email: str, senha: str) -> Usuario:
         existente = self.repository.buscar_por_email(email)
         if existente:
-            raise ValueError("Já existe uma conta com este e-mail")
+            raise ValueError("Jﾃ｡ existe uma conta com este e-mail")
 
         print(f"DEBUG - Tamanho real da senha recebida: {len(senha)} caracteres")
         senha_hash = pwd_context.hash(senha)
@@ -61,6 +61,7 @@ class CadastroUseCase:
         novo_usuario = Usuario(
             id=None,
             nome=nome,
+            cargo=cargo,
             email=email,
             senha_hash=senha_hash
         )
@@ -70,8 +71,8 @@ class CadastroUseCase:
 
 class RecuperarSenhaUseCase:
     """
-    Caso de uso: Gerar token de recuperação de senha.
-    (Por simplicidade, retorna o token direto — em produção enviaria por email)
+    Caso de uso: Gerar token de recuperaﾃｧﾃ｣o de senha.
+    (Por simplicidade, retorna o token direto 窶・em produﾃｧﾃ｣o enviaria por email)
     """
 
     def __init__(self, repository: IUsuarioRepository):
@@ -80,8 +81,8 @@ class RecuperarSenhaUseCase:
     def executar(self, email: str) -> str:
         usuario = self.repository.buscar_por_email(email)
         if not usuario:
-            # Por segurança, não revelamos se o email existe ou não
-            return "Se o email estiver cadastrado, você receberá as instruções"
+            # Por seguranﾃｧa, nﾃ｣o revelamos se o email existe ou nﾃ｣o
+            return "Se o email estiver cadastrado, vocﾃｪ receberﾃ｡ as instruﾃｧﾃｵes"
 
         payload = {
             "sub": str(usuario.id),
@@ -95,7 +96,7 @@ class RecuperarSenhaUseCase:
 
 class RedefinirSenhaUseCase:
     """
-    Caso de uso: Redefinir senha a partir de um token de recuperação.
+    Caso de uso: Redefinir senha a partir de um token de recuperaﾃｧﾃ｣o.
     """
 
     def __init__(self, repository: IUsuarioRepository):
@@ -105,16 +106,16 @@ class RedefinirSenhaUseCase:
         try:
             payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
         except Exception:
-            raise ValueError("Token inválido ou expirado")
+            raise ValueError("Token invﾃ｡lido ou expirado")
 
         if payload.get("tipo") != "recuperar_senha":
-            raise ValueError("Token inválido")
+            raise ValueError("Token invﾃ｡lido")
 
         usuario_id = int(payload["sub"])
         usuario = self.repository.buscar_por_id(usuario_id)
 
         if not usuario:
-            raise ValueError("Usuário não encontrado")
+            raise ValueError("Usuﾃ｡rio nﾃ｣o encontrado")
 
         usuario.senha_hash = pwd_context.hash(nova_senha)
         self.repository.atualizar(usuario)
@@ -122,28 +123,27 @@ class RedefinirSenhaUseCase:
 
 class EditarPerfilUseCase:
     """
-    Caso de uso: Atualizar dados do perfil do usuário logado.
+    Caso de uso: Atualizar dados do perfil do usuﾃ｡rio logado.
     """
 
     def __init__(self, repository: IUsuarioRepository):
         self.repository = repository
 
-    def executar(self, usuario_id: int, nome: str, cargo: str, bio: str) -> Usuario:
+    def executar(self, usuario_id: int, nome: str, cargo: str) -> Usuario:
         usuario = self.repository.buscar_por_id(usuario_id)
 
         if not usuario:
-            raise ValueError("Usuário não encontrado")
+            raise ValueError("Usuﾃ｡rio nﾃ｣o encontrado")
 
         usuario.nome = nome
         usuario.cargo = cargo
-        usuario.bio = bio
 
         return self.repository.atualizar(usuario)
 
 
 class AlterarSenhaUseCase:
     """
-    Caso de uso: Alterar senha do usuário logado (exige senha atual).
+    Caso de uso: Alterar senha do usuﾃ｡rio logado (exige senha atual).
     """
 
     def __init__(self, repository: IUsuarioRepository):
@@ -153,10 +153,11 @@ class AlterarSenhaUseCase:
         usuario = self.repository.buscar_por_id(usuario_id)
 
         if not usuario:
-            raise ValueError("Usuário não encontrado")
+            raise ValueError("Usuﾃ｡rio nﾃ｣o encontrado")
 
         if not pwd_context.verify(senha_atual, usuario.senha_hash):
             raise ValueError("Senha atual incorreta")
 
         usuario.senha_hash = pwd_context.hash(nova_senha)
         self.repository.atualizar(usuario)
+

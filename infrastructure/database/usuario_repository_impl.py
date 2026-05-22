@@ -23,7 +23,6 @@ class UsuarioRepositoryImpl(IUsuarioRepository):
             email=model.email,
             senha_hash=model.senha_hash,
             cargo=model.cargo,
-            bio=model.bio,
             criado_em=model.criado_em
         )
 
@@ -33,7 +32,6 @@ class UsuarioRepositoryImpl(IUsuarioRepository):
             email=usuario.email,
             senha_hash=usuario.senha_hash,
             cargo=usuario.cargo,
-            bio=usuario.bio
         )
         self.db.add(model)
         self.db.commit()
@@ -62,7 +60,6 @@ class UsuarioRepositoryImpl(IUsuarioRepository):
 
         model.nome = usuario.nome
         model.cargo = usuario.cargo
-        model.bio = usuario.bio
         model.senha_hash = usuario.senha_hash
 
         self.db.commit()

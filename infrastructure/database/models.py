@@ -17,5 +17,4 @@ class UsuarioModel(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     senha_hash = Column(String(255), nullable=False)
     cargo = Column(String(255), default="")
-    bio = Column(String(1000), default="")
     criado_em = Column(DateTime, default=datetime.utcnow)

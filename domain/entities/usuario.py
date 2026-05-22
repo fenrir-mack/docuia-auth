@@ -14,7 +14,6 @@ class Usuario:
     email: str
     senha_hash: str
     cargo: str = ""
-    bio: str = ""
     criado_em: datetime = field(default_factory=datetime.utcnow)
 
     def tem_dados_completos(self) -> bool:
