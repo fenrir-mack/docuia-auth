@@ -72,7 +72,7 @@ class CadastroUseCase:
 class RecuperarSenhaUseCase:
     """
     Caso de uso: Gerar token de recuperação de senha.
-    (Por simplicidade, retorna o token direto  Eem produção enviaria por email)
+    (Por simplicidade, retorna o token direto; em produção enviaria por email)
     """
 
     def __init__(self, repository: IUsuarioRepository):
