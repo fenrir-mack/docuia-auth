@@ -5,7 +5,6 @@ from jose import jwt
 from datetime import datetime, timedelta
 import os
 
-# Trocado de bcrypt para pbkdf2_sha256 para evitar o erro de limite de 72 bytes no Azure
 pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 
 JWT_SECRET = os.getenv("JWT_SECRET", "docuia-secret-dev")
@@ -25,10 +24,10 @@ class LoginUseCase:
         usuario = self.repository.buscar_por_email(email)
 
         if not usuario:
-            raise ValueError("Email ou senha invﾃ｡lidos")
+            raise ValueError("Email ou senha inválidos")
 
         if not pwd_context.verify(senha, usuario.senha_hash):
-            raise ValueError("Email ou senha invﾃ｡lidos")
+            raise ValueError("Email ou senha inválidos")
 
         payload = {
             "sub": str(usuario.id),
@@ -53,7 +52,7 @@ class CadastroUseCase:
     def executar(self, nome: str, cargo: str, email: str, senha: str) -> Usuario:
         existente = self.repository.buscar_por_email(email)
         if existente:
-            raise ValueError("Jﾃ｡ existe uma conta com este e-mail")
+            raise ValueError("Já｡ existe uma conta com este e-mail")
 
         print(f"DEBUG - Tamanho real da senha recebida: {len(senha)} caracteres")
         senha_hash = pwd_context.hash(senha)
@@ -81,8 +80,7 @@ class RecuperarSenhaUseCase:
     def executar(self, email: str) -> str:
         usuario = self.repository.buscar_por_email(email)
         if not usuario:
-            # Por seguranﾃｧa, nﾃ｣o revelamos se o email existe ou nﾃ｣o
-            return "Se o email estiver cadastrado, vocﾃｪ receberﾃ｡ as instruﾃｧﾃｵes"
+            return "Se o email estiver cadastrado, você receberá｡ as instruções"
 
         payload = {
             "sub": str(usuario.id),
@@ -133,7 +131,7 @@ class EditarPerfilUseCase:
         usuario = self.repository.buscar_por_id(usuario_id)
 
         if not usuario:
-            raise ValueError("Usuﾃ｡rio nﾃ｣o encontrado")
+            raise ValueError("Usuário não encontrado")
 
         usuario.nome = nome
         usuario.cargo = cargo
@@ -153,7 +151,7 @@ class AlterarSenhaUseCase:
         usuario = self.repository.buscar_por_id(usuario_id)
 
         if not usuario:
-            raise ValueError("Usuﾃ｡rio nﾃ｣o encontrado")
+            raise ValueError("Usuário não encontrado")
 
         if not pwd_context.verify(senha_atual, usuario.senha_hash):
             raise ValueError("Senha atual incorreta")
